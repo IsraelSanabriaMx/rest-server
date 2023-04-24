@@ -1,36 +1,72 @@
 const { request, response } = require('express');
+const bcryptjs = require('bcryptjs');
 
-const usersGet = (req = request, res = response) => {
-  const { page = '1', limit } = req.query;
+const User = require('../models/user');
+
+const usersGet = async (req = request, res = response) => {
+  const { from = 0, limit = 5 } = req.query;
+  const filters = {
+    status: true,
+  };
+
+  const [total, users] = await Promise.all([
+    User.countDocuments(filters),
+    User.find(filters)
+      .skip(Number(from))
+      .limit(Number(limit)),
+  ]);
+
   res.json({
-    msg: 'GET - Controller',
-    page,
-    limit,
+    total,
+    users,
   });
 };
 
-const usersPut = (req = request, res = response) => {
+const usersPut = async (req = request, res = response) => {
+  const { id } = req.params;
+  const { password, email, ...rest } = req.body;
+
+  if (password) {
+    const bcryptPass = encryptPassword(password);
+    rest.password = bcryptPass;
+  }
+
+  const user = await User.findByIdAndUpdate(id, rest);
+
+  res.json({
+    user,
+  });
+};
+
+const encryptPassword = (password) => {
+  const salt = bcryptjs.genSaltSync();
+
+  return bcryptjs.hashSync(password, salt);
+};
+
+const usersPost = async (req = request, res = response) => {
+  const user = new User(req.body);
+  const bcryptPass = encryptPassword(user.password);
+  user.password = bcryptPass;
+
+  await user.save();
+
+  res.json({
+    user,
+  });
+};
+
+const usersDelete = async (req = request, res = response) => {
   const { id } = req.params;
 
-  res.json({
-    msg: 'PUT - Controller',
-    id,
-  });
-};
+  // Remove from DB
+  // const user = await User.findByIdAndDelete(id);
 
-const usersPost = (req = request, res = response) => {
-  const { name, age } = req.body;
+  // Update status
+  const user = await User.findByIdAndUpdate(id, { status: false });
 
   res.json({
-    msg: 'POST - Controller',
-    name,
-    age,
-  });
-};
-
-const usersDelete = (req = request, res = response) => {
-  res.json({
-    msg: 'DELETE - Controller',
+    user,
   });
 };
 
