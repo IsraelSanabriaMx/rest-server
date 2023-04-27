@@ -3,7 +3,7 @@ const { check } = require('express-validator');
 
 const { validateFields, validateJwt, validateIsAdmin } = require('../middlewares');
 const { getProducts, getProductById, createProduct, updateProduct, deleteProduct } = require('../controllers/products');
-const { validateProductId, validateCategoryId } = require('../helpers/db-validators');
+const { validateProductId, validateCategoryId } = require('../helpers');
 
 const router = Router();
 

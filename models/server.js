@@ -1,5 +1,7 @@
 const express = require('express');
-var cors = require('cors');
+const cors = require('cors');
+const fileUpload = require('express-fileupload');
+
 const { connect } = require('../database/config');
 
 const PATH = '/api';
@@ -12,7 +14,8 @@ class Server {
       auth: `${PATH}/auth`,
       categories: `${PATH}/categories`,
       products: `${PATH}/products`,
-      search: `${PATH}/search`,
+      searchs: `${PATH}/searchs`,
+      uploads: `${PATH}/uploads`,
       users: `${PATH}/users`,
     };
 
@@ -29,14 +32,21 @@ class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.static('public'));
+
+    this.app.use(fileUpload({
+      useTempFiles: true,
+      tempFileDir: '/tmp/',
+      createParentPath: true, // only if we needs
+    }));
   }
 
   routes() {
     this.app.use(this.paths.auth, require('../routes/auth'));
     this.app.use(this.paths.categories, require('../routes/categories'));
     this.app.use(this.paths.products, require('../routes/products'));
-    this.app.use(this.paths.search, require('../routes/search'));
-    this.app.use(this.paths.users, require('../routes/user'));
+    this.app.use(this.paths.searchs, require('../routes/searchs'));
+    this.app.use(this.paths.uploads, require('../routes/uploads'));
+    this.app.use(this.paths.users, require('../routes/users'));
   }
 
   listen() {

@@ -3,7 +3,7 @@ const { check } = require('express-validator');
 
 const { getCategories, getCategoryById, updateCategory, createCategory, deleteCategory } = require('../controllers/categories');
 const { validateFields, validateJwt, validateIsAdmin } = require('../middlewares');
-const { validateCategoryId } = require('../helpers/db-validators');
+const { validateCategoryId } = require('../helpers');
 
 const router = Router();
 

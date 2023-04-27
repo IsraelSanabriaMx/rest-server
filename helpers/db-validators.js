@@ -41,10 +41,21 @@ const validateProductId = async (id = '') => {
   }
 };
 
+const collectionsAllowed = (collection, collections = []) => {
+  const isAllowed = collections.includes(collection);
+
+  if (!isAllowed) {
+    throw new Error(`The collection ${collection} is not allowed, ${collections}`);
+  }
+
+  return true;
+};
+
 module.exports = {
   roleValidator,
   emailDuplicated,
   validateUserId,
   validateCategoryId,
   validateProductId,
+  collectionsAllowed,
 };
